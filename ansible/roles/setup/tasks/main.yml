@@ -1,0 +1,13 @@
+---
+
+- name: Creacion de directorios de configuracion del contenedor
+  ansible.builtin.file:
+    path: "{{ base_config_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - "{{ preconf_dirs }}"
+
+- ansible.builtin.include_tasks: "01-OSPackages.yml"
+- ansible.builtin.include_tasks: "02-nginx.yml"
+- ansible.builtin.include_tasks: "03-ssl.yml"
+- ansible.builtin.include_tasks: "04-podman.yml"

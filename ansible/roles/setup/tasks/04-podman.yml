@@ -1,0 +1,57 @@
+---
+
+- name: Login a ACR
+  containers.podman.podman_login:
+    username: "{{ acrcp2_user }}"
+    password: "{{ acrcp2_pwd }}"
+    registry: "{{ acrcp2_url }}"
+  become: true
+  become_user: root
+  become_method: sudo
+
+- name: Containerfile template
+  ansible.builtin.template:
+    src: "Containerfile.j2"
+    dest: "{{ base_config_dir }}/Containerfile"
+
+- name: Creacion de la imagen
+  containers.podman.podman_image:
+    name: webserver
+    path: "{{ base_config_dir }}"
+    push: true
+    push_args:
+      dest: "{{ acrcp2_url }}"
+  become: true
+  become_user: root
+  become_method: sudo
+
+- name: Ejecucion
+  containers.podman.podman_container:
+    name: "webserver"
+    image: "{{ acrcp2_url }}/webserver"
+    recreate: yes
+    ports: 
+      - "443:443/tcp"
+    state: started
+  become: true
+  become_user: root
+  become_method: sudo
+  register: container
+
+- name: Unit file para el webserver
+  containers.podman.podman_generate_systemd:
+    name: "{{ container.container.Id }}"
+    dest: "{{ systemd_unit_path }}"
+  become: true
+  become_user: root
+  become_method: sudo
+
+- name: Contenedor configurado e iniciado
+  systemd:
+    name: container-webserver
+    daemon_reload: yes
+    state: started
+    enabled: yes
+  become: true
+  become_user: root
+  become_method: sudo

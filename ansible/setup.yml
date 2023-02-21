@@ -1,0 +1,15 @@
+---
+
+- hosts: vm
+
+  gather_facts: false
+  any_errors_fatal: true
+
+  vars_files:
+    - "secrets.yml"
+
+  vars:
+    operations: [start]
+
+  roles:
+    - setup
