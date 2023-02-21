@@ -87,8 +87,8 @@ module "cp2_ssh_key" {
   resource_group_name = azurerm_resource_group.cp2_rg.name
   location            = azurerm_resource_group.cp2_rg.location
   public_key          = var.public_key
-  // below dependency is needed because resource group takes long to be created and is prone to timeout
-  depends = [azurerm_resource_group.cp2_rg.id]
+  # // below dependency is needed because resource group takes long to be created and is prone to timeout
+  # depends = [azurerm_resource_group.cp2_rg.id]
 }
 
 module "create_acr" {

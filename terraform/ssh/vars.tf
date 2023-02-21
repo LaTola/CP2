@@ -14,6 +14,6 @@ variable "public_key" {
   type = string
 }
 
-variable "depends" {
-  type = list(string)
-}
+# variable "depends" {
+#   type = list(string)
+# }
