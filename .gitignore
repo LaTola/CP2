@@ -1,4 +1,4 @@
 .terraform/
 makeenv.sh
 .vaultpasswd
-terraform.tfstate
+terraform.tfstate*
