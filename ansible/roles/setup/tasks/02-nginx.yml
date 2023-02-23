@@ -1,6 +1,6 @@
 ---
 
-- name: Creacion de la base de datos de nginx con usuario
+- name: Creacion del archivo de htpasswd para autenticacion basica
   ansible.builtin.htpasswd:
     path: "{{ base_config_dir }}/{{ nginx_dir }}/{{ nginx_passwd_file_name }}"
     name: "{{ nginx_basic_user }}"
