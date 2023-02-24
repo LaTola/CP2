@@ -1,0 +1,5 @@
+FROM docker.io/pihole/pihole:latest
+RUN apt update && apt upgrade -y && apt install -y procps && \
+    apt autoremove -y && apt clean
+# Exponer el puerto 80
+EXPOSE 80
