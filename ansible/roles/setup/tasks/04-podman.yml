@@ -1,5 +1,4 @@
 ---
-
 - name: Login a ACR
   containers.podman.podman_login:
     username: "{{ acrcp2_user }}"
@@ -9,28 +8,29 @@
   become_user: root
   become_method: sudo
 
-- name: Containerfile template
+- name: Podman Containerfile template
   ansible.builtin.template:
-    src: "Containerfile.j2"
+    src: "vm_containerfile.j2"
     dest: "{{ base_config_dir }}/Containerfile"
 
-- name: Creacion de la imagen
+- name: Creacion de la imagen web de podman
   containers.podman.podman_image:
-    name: webserver
+    name: "{{ web_name }}"
     path: "{{ base_config_dir }}"
     push: true
     push_args:
       dest: "{{ acrcp2_url }}"
+      remove_signatures: true
   become: true
   become_user: root
   become_method: sudo
 
 - name: Ejecucion
   containers.podman.podman_container:
-    name: "webserver"
-    image: "{{ acrcp2_url }}/webserver"
+    name: "{{ web_name }}"
+    image: "{{ acrcp2_url }}/{{ web_name }}"
     recreate: yes
-    ports: 
+    ports:
       - "443:443/tcp"
     state: started
   become: true
@@ -48,10 +48,30 @@
 
 - name: Contenedor configurado e iniciado
   systemd:
-    name: container-webserver
+    name: "container-{{ web_name }}"
     daemon_reload: yes
     state: started
     enabled: yes
   become: true
   become_user: root
   become_method: sudo
+
+- name: Podman Containerfile template
+  ansible.builtin.template:
+    src: "k8s_containerfile.j2"
+    dest: "{{ base_config_dir }}/{{ k8s_dir }}/Containerfile"
+
+- name: Creacion de la imagen web de k8s
+  containers.podman.podman_image:
+    name: "{{ ak8s_app_name }}"
+    path: "{{ base_config_dir }}/{{ k8s_dir }}"
+    build:
+      cache: no
+      force_rm: yes
+    push: true
+    push_args:
+      dest: "{{ acrcp2_url }}"
+  become: true
+  become_user: root
+  become_method: sudo
+
