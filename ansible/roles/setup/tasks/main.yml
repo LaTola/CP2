@@ -12,6 +12,7 @@
     - ansible.builtin.include_tasks: "02-nginx.yml"
     - ansible.builtin.include_tasks: "03-ssl.yml"
     - ansible.builtin.include_tasks: "04-podman.yml"
+    - ansible.builtin.include_tasks: "05-limpieza.yml"
   when: 
     - "'vm' in group_names"
 
