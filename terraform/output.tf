@@ -31,22 +31,7 @@ output "podman_public_ip_id" {
   description = "Podman VM public IP id"
 }
 
-# // kubernetes public IP outputs
-# output "k8s_public_ip_address" {
-#   value       = module.k8s_public_ip.cp2_public_ip_address
-#   description = "Kubernetes Cluster public IP address"
-# }
-
-# // Kubernetes cluster public IP id
-# output "k8s_public_ip_id" {
-#   value       = module.k8s_public_ip.cp2_public_ip_id
-#   description = "Kubernetes Cluster public IP id"
-# }
-
-# output "cp2aks_client_cert" {
-#   value     = azurerm_kubernetes_cluster.cp2_aks.kube_config.0.cp2aks_client_cert
-#   sensitive = true
-# }
+// AKS outputs
 
 output "cp2aks_host" {
   value = azurerm_kubernetes_cluster.cp2_aks.fqdn
