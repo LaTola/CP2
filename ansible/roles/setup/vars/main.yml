@@ -1,0 +1,54 @@
+---
+# Azure kubernetes Service vars
+ak8s_app_src_registry: "docker.io/grafana/grafana"
+ak8s_kube_config: ""
+ak8s_tempdir: "/tmp"
+ak8s_app: "grafana"
+ak8s_app_port: 3000
+ak8s_app_login: "login"
+ak8s_app_registry: "{{ acrcp2_url }}/{{ ak8s_app }}"
+
+# VM base vars
+base_packages: 
+  - "podman"
+  - "openssl"
+  - "python3-passlib"
+  - "python3-pip"
+  - "neovim"
+
+pip_packages: 
+  - "kubernetes>=12.0.0"
+  - "PyYAML>=3.11.0"
+  - "jsonpatch"
+
+base_config_dir: "/home/{{ vm_admin_user }}/web_config"
+cert_dir: "{{ base_config_dir }}/cert"
+nginx_dir: "{{ base_config_dir }}/nginx"
+html_dir: "{{ base_config_dir }}/html"
+k8s_dir: "{{ base_config_dir }}/k8s"
+k8s_app_dir: "{{ k8s_dir }}/{{ ak8s_app }}"
+preconf_dirs:
+  - "{{ cert_dir }}"
+  - "{{ nginx_dir }}"
+  - "{{ html_dir }}"
+  - "{{ k8s_dir }}"
+  - "{{ k8s_app_dir }}"
+
+# nginx vars
+nginx_passwd_file_name: ".passwdfile"
+nginx_basic_user: "vm_admin"
+web_name: "nginx_web"
+
+# SSL vars
+ssl_key_file: "podman.key"
+ssl_csr_file: "podman.csr"
+ssl_cert_file: "podman.crt"
+ssl_domain: "podman"
+ssl_country_name: "UY"
+ssl_email_address: "wilbert.iglesias560@comunidadunir.net"
+ssl_common_name: "podman"
+ssl_org_name: "UNIR"
+ssl_org_unit: "DevOps"
+
+# Systemd vars
+systemd_unit_path: "/etc/systemd/system/"
