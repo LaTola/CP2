@@ -1,0 +1,51 @@
+---
+
+- name: Contenedores en la VM
+  containers.podman.podman_image_info:
+  register: list
+  become: true
+  become_user: root
+  become_method: sudo
+
+- name: Listado de contenedores
+  debug: 
+    var: item 
+  loop: "{{ list | community.general.json_query('images[*].Id') }}"
+
+- name: Limpieza de imagenes que no se necesitan localmente
+  any_errors_fatal: false
+  containers.podman.podman_image:
+    name: "{{item}}"
+    state: absent
+    force: true 
+  with_items: 
+    - "{{ list | community.general.json_query('images[*].Id') }}"
+  become: true
+  become_user: root
+  become_method: sudo
+
+- name: Lista de contenedores post-limpieza
+  containers.podman.podman_image_info:
+  register: list
+  become: true
+  become_user: root
+  become_method: sudo
+
+- name: Lista de contenedores final
+  debug: 
+    var: item 
+  loop: "{{ list | community.general.json_query('images[*].Id') }}"
+
+- name: Limpieza total
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ base_config_dir }}"
+    - "{{ ak8s_tempconfig.path }}"
+
+- name: borrado de la copia local de la configuracion del cluster
+  file:
+    path: "{{ ak8s_kube_config }}"
+    state: absent
+
