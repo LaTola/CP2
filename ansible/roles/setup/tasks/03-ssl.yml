@@ -1,13 +1,13 @@
 ---
 - name: Clave privada de OpenSSL
   community.crypto.openssl_privatekey:
-    path: "{{ base_config_dir }}/{{ cert_dir }}/{{ ssl_key_file }}"
+    path: "{{ cert_dir }}/{{ ssl_key_file }}"
     size: 2048
 
 - name: Generacion del signing request de OpenSSL
   community.crypto.openssl_csr:
-    path: "{{ base_config_dir }}/{{ cert_dir }}/{{ ssl_csr_file }}"
-    privatekey_path: "{{ base_config_dir }}/{{ cert_dir }}/{{ ssl_key_file }}"
+    path: "{{ cert_dir }}/{{ ssl_csr_file }}"
+    privatekey_path: "{{ cert_dir }}/{{ ssl_key_file }}"
     country_name: "{{ ssl_country_name }}"
     organization_name: "{{ ssl_org_name }}"
     email_address: "{{ ssl_email_address }}"
@@ -16,7 +16,7 @@
 
 - name: Generar certificado autofirmado
   community.crypto.x509_certificate:
-    path: "{{ base_config_dir }}/{{ cert_dir }}/{{ ssl_cert_file }}"
-    privatekey_path: "{{ base_config_dir }}/{{ cert_dir }}/{{ ssl_key_file }}"
-    csr_path: "{{ base_config_dir }}/{{ cert_dir }}/{{ ssl_csr_file }}"
+    path: "{{ cert_dir }}/{{ ssl_cert_file }}"
+    privatekey_path: "{{ cert_dir }}/{{ ssl_key_file }}"
+    csr_path: "{{ cert_dir }}/{{ ssl_csr_file }}"
     provider: selfsigned
