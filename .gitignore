@@ -2,3 +2,4 @@
 makeenv.sh
 .vaultpasswd
 terraform.tfstate*
+.terraform.lock.hcl
