@@ -1,0 +1,70 @@
+---
+- name: Creacion del archivo temporario de kubeconfig
+  tempfile:
+    path: "{{ ak8s_tempdir }}"
+    state: file
+  register: ak8s_tempconfig
+
+- name: dump kubeconfig
+  copy:
+    src: "{{ ak8s_kube_config }}"
+    dest: "{{ ak8s_tempconfig.path }}"
+    mode: 0600
+
+- name: Podman Containerfile template
+  ansible.builtin.template:
+    src: "k8s_containerfile.j2"
+    dest: "{{ k8s_dir }}/Containerfile"
+
+- name: Creacion de la imagen de grafana
+  containers.podman.podman_image:
+    name: "{{ ak8s_app }}"
+    path: "{{ k8s_dir }}"
+    push: true
+    push_args:
+      dest: "{{ ak8s_app_registry }}"
+      remove_signatures: true
+    tag: "latest"
+    state: present
+  become: true
+  become_user: root
+  become_method: sudo
+
+- name: crear ak8s service template
+  template:
+    src: "{{ ak8s_app }}.yml"
+    dest: "{{ k8s_app_dir }}/{{ ak8s_app }}.yml"
+
+- name: Instalacion de la app k8s
+  kubernetes.core.k8s:
+    kubeconfig: "{{ ak8s_tempconfig.path }}"
+    namespace: "{{ ak8s_app }}"
+    state: present
+    src: "{{ k8s_app_dir }}/{{ ak8s_app }}.yml"
+  register: k8s_service
+
+- name: Esperar por IP publica de acceso al loadbalancer
+  any_errors_fatal: false
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ ak8s_tempconfig.path }}"
+    kind: service
+    name: "{{ ak8s_app }}"
+    namespace: "{{ ak8s_app }}"
+  register: k8s_service
+  until: k8s_service.resources[0].status.loadBalancer.ingress is defined
+  retries: 10
+  delay: 10
+
+- name: Service
+  debug: 
+    var: k8s_service.resources[0].status.loadBalancer
+
+- name: Esperar hasta que el servicio web este disponible
+  any_errors_fatal: false
+  ansible.builtin.uri:
+    url: http://{{ k8s_service.resources[0].status.loadBalancer.ingress[0].ip }}:{{ ak8s_app_port }}/{{ ak8s_app_login }}
+  register: web_ready
+  until: web_ready.status == 200
+  retries: 10
+  delay: 5
+
