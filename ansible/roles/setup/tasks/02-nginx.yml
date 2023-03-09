@@ -2,7 +2,7 @@
 
 - name: Creacion del archivo de htpasswd para autenticacion basica
   ansible.builtin.htpasswd:
-    path: "{{ base_config_dir }}/{{ nginx_dir }}/{{ nginx_passwd_file_name }}"
+    path: "{{ nginx_dir }}/{{ nginx_passwd_file_name }}"
     name: "{{ nginx_basic_user }}"
     password: "{{ nginx_user_password }}"
     mode : 0644
@@ -10,10 +10,10 @@
 - name: Copiar index.html
   ansible.builtin.copy:
     src: "index.html"
-    dest: "{{ base_config_dir }}/{{ html_dir }}"
+    dest: "{{ html_dir }}"
   
 - name: Template nginx.conf 
   ansible.builtin.template:
     src: "nginx.conf.j2"
-    dest: "{{ base_config_dir }}/{{ nginx_dir }}/nginx.conf"
+    dest: "{{ nginx_dir }}/nginx.conf"
 

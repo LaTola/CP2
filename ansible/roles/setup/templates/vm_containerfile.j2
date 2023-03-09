@@ -1,0 +1,12 @@
+FROM docker.io/nginx:latest
+RUN apt update && apt upgrade -y && apt autoremove -y && apt clean
+
+# Copia los archivos de app y configuracion de nginx
+COPY html/index.html /etc/nginx/html/
+COPY cert/{{ ssl_cert_file }} /etc/nginx/
+COPY cert/{{ ssl_key_file }} /etc/nginx/
+COPY nginx/{{ nginx_passwd_file_name }} /etc/nginx/
+COPY nginx/nginx.conf /etc/nginx/
+
+# Exponer el puerto 443
+EXPOSE 443

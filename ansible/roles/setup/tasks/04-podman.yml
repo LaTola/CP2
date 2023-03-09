@@ -1,5 +1,4 @@
 ---
-
 - name: Login a ACR
   containers.podman.podman_login:
     username: "{{ acrcp2_user }}"
@@ -9,28 +8,29 @@
   become_user: root
   become_method: sudo
 
-- name: Containerfile template
+- name: Podman Containerfile template
   ansible.builtin.template:
-    src: "Containerfile.j2"
+    src: "vm_containerfile.j2"
     dest: "{{ base_config_dir }}/Containerfile"
 
-- name: Creacion de la imagen
+- name: Creacion de la imagen web de podman
   containers.podman.podman_image:
-    name: webserver
+    name: "{{ web_name }}"
     path: "{{ base_config_dir }}"
     push: true
     push_args:
       dest: "{{ acrcp2_url }}"
+      remove_signatures: true
   become: true
   become_user: root
   become_method: sudo
 
 - name: Ejecucion
   containers.podman.podman_container:
-    name: "webserver"
-    image: "{{ acrcp2_url }}/webserver"
+    name: "{{ web_name }}"
+    image: "{{ acrcp2_url }}/{{ web_name }}"
     recreate: yes
-    ports: 
+    ports:
       - "443:443/tcp"
     state: started
   become: true
@@ -46,12 +46,47 @@
   become_user: root
   become_method: sudo
 
-- name: Contenedor configurado e iniciado
+- name: Se reinicia el contenedor via systemd
   systemd:
-    name: container-webserver
+    name: "container-{{ web_name }}"
     daemon_reload: yes
-    state: started
+    state: restarted
     enabled: yes
   become: true
   become_user: root
   become_method: sudo
+
+- name: Chequeo si es necesario un reboot de la vm
+  stat:
+    path: /var/run/reboot-required
+  register: reboot
+
+- debug:
+    msg: "Reboot required"
+  when: reboot.stat.exists
+
+- name: Reinicio de la vm
+  reboot: 
+    reboot_timeout: 3600
+  when: reboot.stat.exists
+  become: true
+  become_user: root
+  become_method: sudo
+
+- name: Chequeo de la aplicacion nginx
+  ansible.builtin.uri:
+    method: GET
+    url: "https://{{ ansible_host }}/"
+    user: "{{ nginx_basic_user }}"
+    password: "{{ nginx_user_password }}"
+    force_basic_auth: true
+    validate_certs: no
+    return_content: true
+  register: httpsresult
+
+- name: La aplicacion de nginx no responde
+  any_errors_fatal: true
+  fail:
+      msg: 'El servicio de nginx no responde'
+  when: 
+    - httpsresult.status != 200

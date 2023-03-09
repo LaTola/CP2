@@ -3,7 +3,7 @@
   block:
     - name: Creacion de directorios de configuracion del contenedor
       ansible.builtin.file:
-        path: "{{ base_config_dir }}/{{ item }}"
+        path: "{{ item }}"
         state: directory
       with_items:
         - "{{ preconf_dirs }}"
@@ -12,14 +12,8 @@
     - ansible.builtin.include_tasks: "02-nginx.yml"
     - ansible.builtin.include_tasks: "03-ssl.yml"
     - ansible.builtin.include_tasks: "04-podman.yml"
+    - ansible.builtin.include_tasks: "05-k8s.yml"
+    - ansible.builtin.include_tasks: "06-limpieza.yml"
+
   when: 
     - "'vm' in group_names"
-
-- name: Setup Kubernetes Cluster
-  block:
-    - name: debug 
-      debug:
-        var: "{{ group_names }}"
-  
-  when:
-    - "'k8s' in group_names"

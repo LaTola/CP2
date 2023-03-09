@@ -12,7 +12,7 @@ resource "azurerm_virtual_network" "cp2_network" {
 }
 
 resource "azurerm_network_security_group" "cp2_nsg" {
-  name                = "cp2NetworkSecurityGroup"
+  name                = "cp2networksecuritygroup"
   resource_group_name = azurerm_resource_group.cp2_rg.name
   location            = azurerm_resource_group.cp2_rg.location
 
@@ -36,6 +36,30 @@ resource "azurerm_network_security_group" "cp2_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "HTTP"
+    priority                   = 1003
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  
+  security_rule {
+    name                       = "grafana-HTTP"
+    priority                   = 1004
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "3000"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
@@ -83,12 +107,10 @@ module "podman_vm" {
 // Upload SSH key to rg
 module "cp2_ssh_key" {
   source              = "./ssh"
-  name                = "cp2_ssh_key"
+  name                = "cp2sshkey"
   resource_group_name = azurerm_resource_group.cp2_rg.name
   location            = azurerm_resource_group.cp2_rg.location
   public_key          = var.public_key
-  # // below dependency is needed because resource group takes long to be created and is prone to timeout
-  # depends = [azurerm_resource_group.cp2_rg.id]
 }
 
 module "create_acr" {
@@ -107,21 +129,27 @@ module "podman_public_ip" {
   location            = azurerm_resource_group.cp2_rg.location
 }
 
-module "k8s_public_ip" {
-  source              = "./public_ip"
-  name                = "cp2k8spubip"
+resource "azurerm_kubernetes_cluster" "cp2_aks" {
+  name                = "cp2aks"
   resource_group_name = azurerm_resource_group.cp2_rg.name
   location            = azurerm_resource_group.cp2_rg.location
+  dns_prefix          = "cp2aks"
+
+  default_node_pool {
+    name       = "default"
+    node_count = 1
+    vm_size    = "Standard_D2_v2"
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
-resource "null_resource" "run_ansible" {
-  provisioner "local-exec" {
-    command = "${path.module}/ansible_wrapper.sh"
-  }
-  depends_on = [
-    module.create_acr, 
-    module.cp2_ssh_key, 
-    module.podman_public_ip,
-    module.podman_vm
-  ]
+resource "azurerm_role_assignment" "cp2_aks_pull_acr" {
+  principal_id                     = azurerm_kubernetes_cluster.cp2_aks.kubelet_identity[0].object_id
+  role_definition_name             = "AcrPull"
+  scope                            = module.create_acr.acr_id
+  skip_service_principal_aad_check = true
 }
+
