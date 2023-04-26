@@ -1,12 +1,5 @@
 ---
-- name: Login a ACR
-  containers.podman.podman_login:
-    username: "{{ acrcp2_user }}"
-    password: "{{ acrcp2_pwd }}"
-    registry: "{{ acrcp2_url }}"
-  become: true
-  become_user: root
-  become_method: sudo
+- ansible.builtin.include_tasks: "ACR_login.yml"
 
 - name: Podman Containerfile template
   ansible.builtin.template:

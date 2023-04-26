@@ -1,4 +1,7 @@
 ---
+
+- ansible.builtin.include_tasks: "ACR_login.yml"
+
 - name: Creacion del archivo temporario de kubeconfig
   tempfile:
     path: "{{ ak8s_tempdir }}"
