@@ -1,0 +1,9 @@
+---
+- name: Login a ACR
+  containers.podman.podman_login:
+    username: "{{ acrcp2_user }}"
+    password: "{{ acrcp2_pwd }}"
+    registry: "{{ acrcp2_url }}"
+  become: true
+  become_user: root
+  become_method: sudo
