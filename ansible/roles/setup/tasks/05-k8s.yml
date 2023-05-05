@@ -1,6 +1,6 @@
 ---
 
-- ansible.builtin.include_tasks: "ACR_login.yml"
+- ansible.builtin.include_tasks: "include/ACR_login.yml"
 
 - name: Creacion del archivo temporario de kubeconfig
   tempfile:
