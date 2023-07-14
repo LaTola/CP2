@@ -115,7 +115,7 @@ module "cp2_ssh_key" {
 
 module "create_acr" {
   source              = "./acr"
-  name                = "cp2acr"
+  name                = "cp2ContainerReg"
   resource_group_name = azurerm_resource_group.cp2_rg.name
   location            = azurerm_resource_group.cp2_rg.location
   sku                 = "Basic"
