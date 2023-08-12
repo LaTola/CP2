@@ -1,5 +1,10 @@
 {
-    "ansible.python.interpreterPath": "/bin/python",
+    "ansible.python.interpreterPath": "/bin/python3",
     "ansible.lightspeed.enabled": true,
-    "ansible.lightspeed.suggestions.enabled": true
+    "ansible.lightspeed.suggestions.enabled": true,
+    "yaml.schemas": {
+        "file:///toc.schema.json": "/toc\\.yml/i",
+        "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/tasks": "file:///home/wilbert/Documents/UNIR/CP2/ansible/roles/setup/tasks/04-podman.yml",
+        "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook": "file:///home/wilbert/Documents/UNIR/CP2/ansible/setup.yml"
+    }
 }
