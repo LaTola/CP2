@@ -51,7 +51,7 @@ resource "azurerm_network_security_group" "cp2_nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-  
+
   security_rule {
     name                       = "grafana-HTTP"
     priority                   = 1004
