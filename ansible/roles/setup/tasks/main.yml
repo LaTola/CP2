@@ -15,5 +15,5 @@
     - ansible.builtin.include_tasks: "05-k8s.yml"
     - ansible.builtin.include_tasks: "06-limpieza.yml"
 
-  when: 
+  when:
     - "'vm' in group_names"

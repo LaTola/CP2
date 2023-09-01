@@ -59,7 +59,7 @@
   when: reboot.stat.exists
 
 - name: Reinicio de la vm
-  reboot: 
+  reboot:
     reboot_timeout: 3600
   when: reboot.stat.exists
   become: true
@@ -80,6 +80,6 @@
 - name: La aplicacion de nginx no responde
   any_errors_fatal: true
   fail:
-      msg: 'El servicio de nginx no responde'
-  when: 
+    msg: "El servicio de nginx no responde"
+  when:
     - httpsresult.status != 200

@@ -1,5 +1,4 @@
 ---
-
 - name: Contenedores en la VM
   containers.podman.podman_image_info:
   register: list
@@ -8,8 +7,8 @@
   become_method: sudo
 
 - name: Listado de contenedores
-  debug: 
-    var: item 
+  debug:
+    var: item
   loop: "{{ list | community.general.json_query('images[*].Id') }}"
 
 - name: Limpieza de imagenes que no se necesitan localmente
@@ -17,8 +16,8 @@
   containers.podman.podman_image:
     name: "{{item}}"
     state: absent
-    force: true 
-  with_items: 
+    force: true
+  with_items:
     - "{{ list | community.general.json_query('images[*].Id') }}"
   become: true
   become_user: root
@@ -32,8 +31,8 @@
   become_method: sudo
 
 - name: Lista de contenedores final
-  debug: 
-    var: item 
+  debug:
+    var: item
   loop: "{{ list | community.general.json_query('images[*].Id') }}"
 
 - name: Limpieza total
@@ -48,4 +47,3 @@
   file:
     path: "{{ ak8s_kube_config }}"
     state: absent
-

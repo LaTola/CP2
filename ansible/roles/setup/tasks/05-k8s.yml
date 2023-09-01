@@ -1,5 +1,4 @@
 ---
-
 - ansible.builtin.include_tasks: "include/ACR_login.yml"
 
 - name: Creacion del archivo temporario de kubeconfig
@@ -59,7 +58,7 @@
   delay: 10
 
 - name: Service
-  debug: 
+  debug:
     var: k8s_service.resources[0].status.loadBalancer
 
 - name: Esperar hasta que el servicio web este disponible
@@ -70,4 +69,3 @@
   until: web_ready.status == 200
   retries: 10
   delay: 5
-
