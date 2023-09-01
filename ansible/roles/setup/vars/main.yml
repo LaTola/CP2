@@ -9,14 +9,14 @@ ak8s_app_login: "login"
 ak8s_app_registry: "{{ acrcp2_url }}/{{ ak8s_app }}"
 
 # VM base vars
-base_packages: 
+base_packages:
   - "podman"
   - "openssl"
   - "python3-passlib"
   - "python3-pip"
   - "neovim"
 
-pip_packages: 
+pip_packages:
   - "kubernetes>=12.0.0"
   - "PyYAML>=3.11.0"
   - "jsonpatch"
